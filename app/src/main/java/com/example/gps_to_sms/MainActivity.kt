@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-    var phoneNumber:String="+573005680543"
+    var phoneNumber:String="+57"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
 
             val locationRequest = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
-                10000
+                15000
             ).apply {
                 setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
                 setWaitForAccurateLocation(true)

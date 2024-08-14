@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="visible"
     tools:context=".MainActivity">
 
     <Button
@@ -43,6 +44,7 @@
         android:layout_marginStart="175dp"
         android:layout_marginTop="60dp"
         android:layout_marginEnd="175dp"
+        android:clickable="false"
         android:text="GPS"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@+id/textView10"
@@ -137,19 +139,5 @@
         android:text="Ingrese el numero de telefono al que desea enviar el SMS."
         app:layout_constraintBottom_toTopOf="@+id/textInputLayout"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="121dp"
-        android:layout_height="137dp"
-        android:layout_marginStart="63dp"
-        android:layout_marginTop="62dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="203dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView10"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/parca" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
