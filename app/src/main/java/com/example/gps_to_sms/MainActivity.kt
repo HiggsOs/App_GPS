@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        val message = "Latitude: ${ubicacion.latitude}, Longitude: ${ubicacion.longitude},Time stamp: ${ubicacion.time}"
+        val message = "LAT: ${ubicacion.latitude}, LONG: ${ubicacion.longitude},TIME: ${ubicacion.time}"
 
         if (ContextCompat.checkSelfPermission(
                 this,
