@@ -23,6 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.OutputStream
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
 import java.net.Socket
 
 
@@ -154,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
         val message = "LAT: ${ubicacion.latitude}, LONG: ${ubicacion.longitude},TIME: ${ubicacion.time}"
 
-        sendTcpData("hostgps.ddns.net",40000,message)
+        sendUdpData("hostgps.ddns.net",41000,message)
 
 
     }
@@ -175,15 +178,57 @@ class MainActivity : AppCompatActivity() {
 
                 // Opcional: Imprimir en Log para confirmar envío
                 Log.d("TCP", "Datos enviados correctamente: $message")
+                runOnUiThread {
+                    Toast.makeText(applicationContext, "Datos enviados correctamente", Toast.LENGTH_SHORT).show()
+                }
 
             } catch (e: Exception) {
                 // Manejar excepciones
                 Log.e("TCP", "Error al enviar datos: ${e.message}")
+                runOnUiThread {
+                    Toast.makeText(applicationContext, "Error al enviar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
 
                 e.printStackTrace()
             }
         }
     }
+    fun sendUdpData(ip: String, port: Int = 40000, message: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Convertir el mensaje a un array de bytes
+                val messageBytes = message.toByteArray()
+
+                // Crear el DatagramPacket para enviar los datos
+                val packet = DatagramPacket(messageBytes, messageBytes.size, InetAddress.getByName(ip), port)
+
+                // Crear un DatagramSocket
+                val socket = DatagramSocket()
+
+                // Enviar el paquete
+                socket.send(packet)
+
+                // Cerrar el socket
+                socket.close()
+
+                // Opcional: Imprimir en Log para confirmar envío
+                Log.d("UDP", "Datos enviados correctamente: $message")
+                runOnUiThread {
+                    Toast.makeText(applicationContext, "Datos enviados correctamente", Toast.LENGTH_SHORT).show()
+                }
+
+            } catch (e: Exception) {
+                // Manejar excepciones
+                Log.e("UDP", "Error al enviar datos: ${e.message}")
+                runOnUiThread {
+                    Toast.makeText(applicationContext, "Error al enviar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+
+                e.printStackTrace()
+            }
+        }
+    }
+
 
 
     override fun onRequestPermissionsResult(
