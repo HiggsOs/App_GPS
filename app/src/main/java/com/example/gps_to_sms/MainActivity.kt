@@ -175,11 +175,11 @@ class MainActivity : AppCompatActivity() {
 
                 // Opcional: Imprimir en Log para confirmar envío
                 Log.d("TCP", "Datos enviados correctamente: $message")
-                Toast.makeText(this@MainActivity, "Datos enviados correctamente", Toast.LENGTH_SHORT).show()
+
             } catch (e: Exception) {
                 // Manejar excepciones
                 Log.e("TCP", "Error al enviar datos: ${e.message}")
-                Toast.makeText(this@MainActivity, "Error al enviar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+
                 e.printStackTrace()
             }
         }
