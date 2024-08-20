@@ -6,10 +6,10 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
-import android.telephony.SmsManager
+
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+
 import androidx.core.content.ContextCompat
 import com.example.gps_to_sms.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -19,6 +19,12 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.OutputStream
+import java.net.Socket
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-    var phoneNumber:String=""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,10 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         verificarPermisos()
 
-        binding.btnactualizar.setOnClickListener {
 
-            phoneNumber=Actualizar_numero()
-        }
 
 
     }
@@ -85,6 +88,8 @@ class MainActivity : AppCompatActivity() {
 
 
         try {
+            // ESta es el API para sacar la informacion del GPS
+
             fusedLocationClient.lastLocation.addOnSuccessListener {
                 if (it != null) {
                     EnviarUbicacion(it)
@@ -92,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "No se puede obtener la ubicacion", Toast.LENGTH_SHORT).show()
                 }
             }
+            // Define la frecuencia a la cual se va a extraer la informacion y su precision
 
             val locationRequest = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
@@ -100,17 +106,17 @@ class MainActivity : AppCompatActivity() {
                 setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
                 setWaitForAccurateLocation(true)
             }.build()
-
+            //Cada que hay un cambio en la informacion del GPS este metodo lo añade a una lista.
             locationCallback = object : LocationCallback() {
                 override fun onLocationResult(p0: LocationResult) {
                     super.onLocationResult(p0)
-
+                    //Extrae la ultima ubicacion y se la envia a la funcion EnviarUbicacion()
                     for (location in p0.locations) {
                         EnviarUbicacion(location)
                     }
                 }
             }
-
+            //Se escanea constantemente los datos de GPS
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
                 locationCallback,
@@ -135,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // Imprime los datos que se van recolectando en la UI
-        binding.tvnumero.text = "${phoneNumber}"
+
         binding.tvlat.text = "${ubicacion.latitude}"
         binding.tvlon.text = "${ubicacion.longitude}"
         binding.tvtime.text = "${ubicacion.time}"
@@ -148,51 +154,37 @@ class MainActivity : AppCompatActivity() {
 
         val message = "LAT: ${ubicacion.latitude}, LONG: ${ubicacion.longitude},TIME: ${ubicacion.time}"
 
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.SEND_SMS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            try {
-                val smsManager = SmsManager.getDefault()
+        sendTcpData("hostgps.ddns.net",40000,message)
 
-                smsManager.sendTextMessage(phoneNumber, null, message, null, null)
-                Toast.makeText(this, "SMS sent!", Toast.LENGTH_SHORT).show()
+
+    }
+    fun sendTcpData(ip: String, port: Int = 40000, message: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Crear un socket TCP
+                val socket = Socket(ip, port)
+                val outputStream: OutputStream = socket.getOutputStream()
+
+                // Enviar datos
+                outputStream.write(message.toByteArray())
+                outputStream.flush()
+
+                // Cerrar el socket
+                outputStream.close()
+                socket.close()
+
+                // Opcional: Imprimir en Log para confirmar envío
+                Log.d("TCP", "Datos enviados correctamente: $message")
+                Toast.makeText(this@MainActivity, "Datos enviados correctamente", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Toast.makeText(this, "SMS failed!", Toast.LENGTH_SHORT).show()
+                // Manejar excepciones
+                Log.e("TCP", "Error al enviar datos: ${e.message}")
+                Toast.makeText(this@MainActivity, "Error al enviar datos: ${e.message}", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
             }
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.SEND_SMS),
-                REQUEST_CODE_SEND_SMS
-            )
         }
     }
-    private fun Actualizar_numero(): String {
-        val identificador = "+57"
-        var numerofinal :String =""
-        try {
-            val numero = binding.inputphone.text.toString()
-            if (numero.isNotEmpty() && numero.length == 10) {
-                // Aquí puedes hacer lo que necesites con el número actualizado
-                Toast.makeText(this, "Número actualizado: $numero", Toast.LENGTH_SHORT).show()
-                numerofinal ="${identificador}${numero}"
 
-            } else {
-                Toast.makeText(this, "Numero no válido!", Toast.LENGTH_SHORT).show()
-                numerofinal ="+573005680543"
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "No se pudo modificar el numero", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
-        }
-
-
-
-        return numerofinal
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
