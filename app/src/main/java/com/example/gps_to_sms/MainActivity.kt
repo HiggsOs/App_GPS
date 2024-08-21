@@ -1,5 +1,6 @@
 package com.example.gps_to_sms
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         val permisos = arrayListOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.SEND_SMS
+
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -136,10 +137,9 @@ class MainActivity : AppCompatActivity() {
             CODIGO_PERMISO_SEGUNDO_PLANO
         )
     }
-    companion object {
-        private const val REQUEST_CODE_SEND_SMS = 123
-    }
+    companion object;
 
+    @SuppressLint("SetTextI18n")
     private fun EnviarUbicacion(ubicacion: Location) {
 
 
@@ -157,11 +157,37 @@ class MainActivity : AppCompatActivity() {
 
         val message = "LAT: ${ubicacion.latitude}, LONG: ${ubicacion.longitude},TIME: ${ubicacion.time}"
 
+        //Enviar informacion a 2 servidores
+
         sendUdpData("hostgps.ddns.net",41000,message)
+        sendTcpData("hostgps.ddns.net",41000,message)
+        sendUdpData("181.236.114.35",20000,message)
+        sendTcpData("181.236.114.35",20000,message)
+
 
 
     }
-    fun sendTcpData(ip: String, port: Int = 40000, message: String) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if(requestCode == CODIGO_PERMISO_SEGUNDO_PLANO) {
+            val todosPermisosConcedidos = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+
+            if (grantResults.isNotEmpty() && todosPermisosConcedidos) {
+                isPermisos = true
+                onPermisosConcedidos()
+            }
+        }
+    }
+
+
+    //Funciones para enviar Datos via TCP y via UDP
+
+    private fun sendTcpData(ip: String, port: Int, message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Crear un socket TCP
@@ -193,7 +219,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    fun sendUdpData(ip: String, port: Int = 40000, message: String) {
+
+
+    private fun sendUdpData(ip: String, port: Int , message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Convertir el mensaje a un array de bytes
@@ -231,21 +259,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == CODIGO_PERMISO_SEGUNDO_PLANO) {
-            val todosPermisosConcedidos = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-
-            if (grantResults.isNotEmpty() && todosPermisosConcedidos) {
-                isPermisos = true
-                onPermisosConcedidos()
-            }
-        }
-    }
 }
 
