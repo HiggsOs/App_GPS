@@ -204,15 +204,13 @@ class MainActivity : AppCompatActivity() {
 
                 // Opcional: Imprimir en Log para confirmar envío
                 Log.d("TCP", "Datos enviados correctamente: $message")
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "Datos enviados correctamente", Toast.LENGTH_SHORT).show()
-                }
+
 
             } catch (e: Exception) {
                 // Manejar excepciones
                 Log.e("TCP", "Error al enviar datos: ${e.message}")
                 runOnUiThread {
-                    Toast.makeText(applicationContext, "Error al enviar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Error al conetar con el sevidor TCP ${ip}", Toast.LENGTH_SHORT).show()
                 }
 
                 e.printStackTrace()
@@ -241,16 +239,12 @@ class MainActivity : AppCompatActivity() {
 
                 // Opcional: Imprimir en Log para confirmar envío
                 Log.d("UDP", "Datos enviados correctamente: $message")
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "Datos enviados correctamente", Toast.LENGTH_SHORT).show()
-                }
+
 
             } catch (e: Exception) {
-                // Manejar excepciones
+
                 Log.e("UDP", "Error al enviar datos: ${e.message}")
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "Error al enviar datos: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+
 
                 e.printStackTrace()
             }
