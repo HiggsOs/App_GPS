@@ -2,6 +2,7 @@ package com.example.gps_to_sms
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.os.Looper
 
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 
 import androidx.core.content.ContextCompat
@@ -160,9 +162,9 @@ class MainActivity : AppCompatActivity() {
         //Enviar informacion a 2 servidores
 
         sendUdpData("hostgps.ddns.net",41000,message)
-        sendTcpData("hostgps.ddns.net",41000,message)
+        sendTcpData("hostgps.ddns.net",41000,message,binding.confirm1)
         sendUdpData("181.236.114.35",20000,message)
-        sendTcpData("181.236.114.35",20000,message)
+        sendTcpData("181.236.114.35",20000,message,binding.comfirm2)
 
 
 
@@ -187,7 +189,7 @@ class MainActivity : AppCompatActivity() {
 
     //Funciones para enviar Datos via TCP y via UDP
 
-    private fun sendTcpData(ip: String, port: Int, message: String) {
+    private fun sendTcpData(ip: String, port: Int, message: String,statusText:TextView) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Crear un socket TCP
@@ -204,16 +206,22 @@ class MainActivity : AppCompatActivity() {
 
                 // Opcional: Imprimir en Log para confirmar envío
                 Log.d("TCP", "Datos enviados correctamente: $message")
-
+                runOnUiThread {
+                    statusText.text = "Online"
+                    statusText.setTextColor(Color.GREEN)
+                }
 
             } catch (e: Exception) {
                 // Manejar excepciones
                 Log.e("TCP", "Error al enviar datos: ${e.message}")
                 runOnUiThread {
                     Toast.makeText(applicationContext, "Error al conetar con el sevidor TCP ${ip}", Toast.LENGTH_SHORT).show()
+                    statusText.text = "Ofline"
+                    statusText.setTextColor(Color.RED)
                 }
-
                 e.printStackTrace()
+
+
             }
         }
     }
