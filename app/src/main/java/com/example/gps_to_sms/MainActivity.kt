@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val CODIGO_PERMISO_SEGUNDO_PLANO = 100
+    private val BACKGROUND_CODE_PERMISSION = 100
     private var isPermisos = false
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        verificarPermisos()
+        verifyPermisions()
 
 
 
@@ -57,28 +57,28 @@ class MainActivity : AppCompatActivity() {
 
 
     //Funcion Principal.
-    private fun verificarPermisos() {
-        val permisos = arrayListOf(
+    private fun verifyPermisions() {
+        val permiss = arrayListOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
 
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            permisos.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            permiss.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
 
-        val permisosArray = permisos.toTypedArray()
-        if (tienePermisos(permisosArray)) {
+        val permissionArray = permiss.toTypedArray()
+        if (checkpermission(permissionArray)) {
             isPermisos = true
-            onPermisosConcedidos()
+            withPermissions()
         } else {
-            solicitarPermisos(permisosArray)
+            request_per(permissionArray)
         }
     }
 
-    private fun tienePermisos(permisos: Array<String>): Boolean {
-        return permisos.all {
+    private fun checkpermission(Permiss: Array<String>): Boolean {
+        return Permiss.all {
             return ContextCompat.checkSelfPermission(
                 this,
                 it
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onPermisosConcedidos() {
+    private fun withPermissions() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
 
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
             fusedLocationClient.lastLocation.addOnSuccessListener {
                 if (it != null) {
-                    EnviarUbicacion(it)
+                    SendLoc(it)
                 } else {
                     Toast.makeText(this, "No se puede obtener la ubicacion", Toast.LENGTH_SHORT).show()
                 }
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
             val locationRequest = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
-                15000
+                10000
             ).apply {
                 setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
                 setWaitForAccurateLocation(true)
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     super.onLocationResult(p0)
                     //Extrae la ultima ubicacion y se la envia a la funcion EnviarUbicacion()
                     for (location in p0.locations) {
-                        EnviarUbicacion(location)
+                        SendLoc(location)
                     }
                 }
             }
@@ -133,16 +133,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun solicitarPermisos(permisos: Array<String>) {
+    private fun request_per(permisos: Array<String>) {
         requestPermissions(
             permisos,
-            CODIGO_PERMISO_SEGUNDO_PLANO
+            BACKGROUND_CODE_PERMISSION
         )
     }
     companion object;
 
     @SuppressLint("SetTextI18n")
-    private fun EnviarUbicacion(ubicacion: Location) {
+    private fun SendLoc(ubicacion: Location) {
 
 
         // Imprime los datos que se van recolectando en la UI
@@ -163,8 +163,8 @@ class MainActivity : AppCompatActivity() {
 
         sendUdpData("hostgps.ddns.net",41000,message)
         sendTcpData("hostgps.ddns.net",41000,message,binding.confirm1)
-        sendUdpData("181.236.114.35",20000,message)
-        sendTcpData("181.236.114.35",20000,message,binding.comfirm2)
+        sendUdpData("181.236.201.131",20000,message)
+        sendTcpData("181.236.201.131",20000,message,binding.comfirm2)
 
 
 
@@ -176,12 +176,12 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == CODIGO_PERMISO_SEGUNDO_PLANO) {
-            val todosPermisosConcedidos = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if(requestCode == BACKGROUND_CODE_PERMISSION) {
+            val A_PERMISSIONS = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
 
-            if (grantResults.isNotEmpty() && todosPermisosConcedidos) {
+            if (grantResults.isNotEmpty() && A_PERMISSIONS) {
                 isPermisos = true
-                onPermisosConcedidos()
+                withPermissions()
             }
         }
     }
