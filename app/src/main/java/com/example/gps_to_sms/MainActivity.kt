@@ -157,14 +157,16 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        val message = "LAT: ${ubicacion.latitude}, LONG: ${ubicacion.longitude},TIME: ${ubicacion.time}"
+        val message = " ${ubicacion.latitude},${ubicacion.longitude},${ubicacion.time}"
 
         //Enviar informacion a 2 servidores
 
-        sendUdpData("hostgps.ddns.net",41000,message)
+
         sendTcpData("hostgps.ddns.net",41000,message,binding.confirm1)
-        sendUdpData("181.236.114.35",20000,message)
-        sendTcpData("181.236.114.35",20000,message,binding.comfirm2)
+
+        sendTcpData("hostgps2.ddns.net",41000,message,binding.comfirm2)
+        sendTcpData("hostgps3.ddns.net",41000,message,binding.comfirm2)
+        sendTcpData("hostgps4.ddns.net",41000,message,binding.comfirm2)
 
 
 
