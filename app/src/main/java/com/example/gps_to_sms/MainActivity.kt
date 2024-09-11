@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("GPS","LAT: ${ubicacion.latitude} - LONG: ${ubicacion.longitude} - Time: ${ubicacion.time} ")
 
-
+        //HOLA
 
         val message = "${ubicacion.latitude}, ${ubicacion.longitude},${ubicacion.time}"
 
