@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
         //HOLA
 
-        val message = "${ubicacion.latitude}, ${ubicacion.longitude},${ubicacion.time}"
+        val message = "${ubicacion.latitude}, ${ubicacion.longitude},${ubicacion.time},1200,300"
 
         //Enviar informacion a 2 servidores
 
