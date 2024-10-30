@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity() {
         if (tienePermisos(permisosArray)) {
             isPermisos = true
             onPermisosConcedidos()
+            scanAndConnectToOBD2()
         } else {
             solicitarPermisos(permisosArray)
         }
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onPermisosConcedidos() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        scanAndConnectToOBD2()
+
         try {
             // ESta es el API para sacar la informacion del GPS
 
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
             val locationRequest = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
-                15000
+                5000
             ).apply {
                 setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
                 setWaitForAccurateLocation(true)
@@ -171,16 +172,16 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun EnviarUbicacion(ubicacion: Location) {
 
-
+        sendRPMCommand()
         // Imprime los datos que se van recolectando en la UI
 
         binding.tvlat.text = "${ubicacion.latitude}"
         binding.tvlon.text = "${ubicacion.longitude}"
         binding.tvtime.text = "${ubicacion.time}"
-
+        binding.textView5.text="${rpmValue}"
         //Envia los datos al Log-cat para verificar que no alla errores.
 
-        Log.d("GPS","LAT: ${ubicacion.latitude} - LONG: ${ubicacion.longitude} - Time: ${ubicacion.time} ")
+        Log.d("GPS","LAT: ${ubicacion.latitude} - LONG: ${ubicacion.longitude} - Time: ${ubicacion.time} - RPM: ${rpmValue}")
 
         //HOLA
 
@@ -314,7 +315,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-           println("No se encontró OBD2 emparejado")
+           Log.d("Emparajamiento","No se encontró OBD2 emparejado")
         }
 
     private fun connectToDevice(device: BluetoothDevice)
@@ -393,7 +394,7 @@ class MainActivity : AppCompatActivity() {
                       e.printStackTrace(
 
                       )
-
+                      Log.e("Error de conexion","Error al conectar con OBD2")
 
                       try
                       {
@@ -421,7 +422,7 @@ class MainActivity : AppCompatActivity() {
                readResponse()
            } catch (e: IOException) {
                e.printStackTrace()
-               println("Error al enviar comando de RPM")
+               Log.e("Error sent rpm","Error al enviar comando de RPM")
            }
    }
    private fun readResponse() {
