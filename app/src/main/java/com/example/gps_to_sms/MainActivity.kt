@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     private val OBD2_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
     private var rpmValue: Int? = 0 // Variable global para almacenar las RPM
 
-
+    private var velocityValue: Int?=0
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,6 +173,7 @@ class MainActivity : AppCompatActivity() {
     private fun EnviarUbicacion(ubicacion: Location) {
 
         sendRPMCommand()
+        readVelocityResponse()
         // Imprime los datos que se van recolectando en la UI
 
         binding.tvlat.text = "${ubicacion.latitude}"
@@ -185,7 +186,7 @@ class MainActivity : AppCompatActivity() {
 
         //HOLA
 
-        val message = "${ubicacion.latitude}, ${ubicacion.longitude},${ubicacion.time},${rpmValue},300,MXL306"
+        val message = "${ubicacion.latitude}, ${ubicacion.longitude},${ubicacion.time},${rpmValue},${velocityValue},MXL306"
 
         //Enviar informacion a 2 servidores
 
@@ -470,6 +471,93 @@ class MainActivity : AppCompatActivity() {
                null // Retorna null si hay un error en el parseo
            }
        }
+
+
+    private fun sendVelocityCommand() {
+        try {
+            val outputStream = bluetoothSocket?.outputStream
+            outputStream?.write("010D\r".toByteArray())
+            outputStream?.flush()
+
+            readVelocityResponse()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.e("Error sent velocity","Error al enviar comando de velocidad")
+        }
+    }
+
+    private fun readVelocityResponse() {
+        try {
+            val inputStream = bluetoothSocket?.inputStream
+            val buffer = ByteArray(1024)
+            val bytes = inputStream?.read(buffer) ?: 0
+            val response = String(buffer, 0, bytes).trim()
+
+            Log.e("Trama recibida de la solicitud de velocidad","Respuesta OBD2: $response")
+            velocityValue = calculateVelocity(response)
+
+            if (velocityValue != null) {
+                Log.e("Valor de velocidad recibido","Velocidad: $velocityValue")
+            } else {
+                Log.e("Error al calcular velocidad","Error al calcular la velocidad")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.e("No se recibio la velocidad","Error al leer respuesta")
+        }
+    }
+
+    private fun calculateVelocity(response: String): Int? {
+        return try {
+            val cleanedResponse = response.replace(" ", "")
+            val hexIndex = cleanedResponse.indexOf("410D")
+            if (hexIndex != -1 && hexIndex + 4 <= cleanedResponse.length) {
+                val velocityHex = cleanedResponse.substring(hexIndex + 4, hexIndex + 6)
+                velocityHex.toInt(16)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
