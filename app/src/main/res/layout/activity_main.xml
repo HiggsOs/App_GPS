@@ -166,6 +166,29 @@
         android:layout_marginEnd="10dp"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="@+id/textView7"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toBottomOf="@+id/textView7"/>
+
+    <TextView
+        android:id="@+id/Velocitytitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/RPMtitle"
+        app:layout_constraintStart_toStartOf="@id/RPMtitle"
+        android:layout_marginTop="16dp"
+        android:text="Velocidad:"
+        android:textColor="#FFFFFF"
+        />
+
+    <TextView
+        android:id="@+id/ValorVelocidad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/Velocitytitle"
+        app:layout_constraintTop_toTopOf="@id/Velocitytitle"
+        app:layout_constraintBottom_toBottomOf="@id/Velocitytitle"
+        android:layout_marginLeft="16dp"
+        />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -173,16 +173,17 @@ class MainActivity : AppCompatActivity() {
     private fun EnviarUbicacion(ubicacion: Location) {
 
         sendRPMCommand()
-        readVelocityResponse()
+        sendVelocityCommand()
         // Imprime los datos que se van recolectando en la UI
 
         binding.tvlat.text = "${ubicacion.latitude}"
         binding.tvlon.text = "${ubicacion.longitude}"
         binding.tvtime.text = "${ubicacion.time}"
         binding.textView5.text="${rpmValue}"
+        binding.ValorVelocidad.text="${velocityValue}"
         //Envia los datos al Log-cat para verificar que no alla errores.
 
-        Log.d("GPS","LAT: ${ubicacion.latitude} - LONG: ${ubicacion.longitude} - Time: ${ubicacion.time} - RPM: ${rpmValue}")
+        Log.d("GPS","LAT: ${ubicacion.latitude} - LONG: ${ubicacion.longitude} - Time: ${ubicacion.time} - RPM: ${rpmValue} - - Velocity: ${velocityValue}")
 
         //HOLA
 
@@ -390,6 +391,7 @@ class MainActivity : AppCompatActivity() {
                       sendRPMCommand(
 
                       )
+                      sendVelocityCommand()
                   } catch (e: IOException)
                   {
                       e.printStackTrace(
